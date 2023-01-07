@@ -3,6 +3,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Hub {
+    
     private String nome;
     private boolean refrigeracao;
     private HashMap<String,Integer> ligacoes;

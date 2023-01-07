@@ -29,6 +29,7 @@ public class Empresa {
         Porto.addLigacao("Madrid",560);
         Hub barcelona = new Hub("Barcelona",true);
         barcelona.addLigacao("Paris",1035);
+        
         Hub Paris = new Hub("Paris",true);
         Paris.addLigacao("Porto",1574);
 

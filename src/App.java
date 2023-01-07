@@ -107,8 +107,5 @@ public class App {
         graph.put(Barcelona.name, Barcelona);
 
         CityMap city_map = new CityMap(graph);
-
-        System.out.println(city_map.get_max_distance());
-
     }
 }
