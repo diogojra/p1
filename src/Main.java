@@ -5,7 +5,8 @@ public class Main {
         leti.criar_hubs_default();
         leti.criar_camioes_default();
         leti.camioes_to_hubs();
-        leti.String();
+        // leti.String();
+        System.out.println(leti.get_min_route("Paris", "Lisboa"));
 
     }
 }

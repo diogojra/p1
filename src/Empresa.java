@@ -1,20 +1,23 @@
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class Empresa {
+    
     private String nome;
     private ArrayList<Camiao> Camioes;
-    private HashSet<Hub> Mapa;
+    private Map<String,Hub> Mapa;
     private ArrayList<Servico> servicos;
 
     public Empresa(String nome){
         this.nome = nome;
         this.Camioes = new ArrayList<Camiao>();
-        this.Mapa = new HashSet<Hub>();
+        this.Mapa = new HashMap<String,Hub>();
         this.servicos = new ArrayList<Servico>();
     }
-
 
     public void criar_hubs_default(){
         Hub Madrid = new Hub("Madrid",true);
@@ -27,17 +30,17 @@ public class Empresa {
         Lisboa.addLigacao("Porto",300);
         Hub Porto = new Hub("Porto",false);
         Porto.addLigacao("Madrid",560);
-        Hub barcelona = new Hub("Barcelona",true);
-        barcelona.addLigacao("Paris",1035);
+        Hub Barcelona = new Hub("Barcelona",true);
+        Barcelona.addLigacao("Paris",1035);
         
         Hub Paris = new Hub("Paris",true);
         Paris.addLigacao("Porto",1574);
 
-        this.Mapa.add(Madrid);
-        this.Mapa.add(Lisboa);
-        this.Mapa.add(Porto);
-        this.Mapa.add(barcelona);
-        this.Mapa.add(Paris);
+        this.Mapa.put("Madrid", Madrid);
+        this.Mapa.put("Lisboa", Lisboa);
+        this.Mapa.put("Porto", Porto);
+        this.Mapa.put("Barcelona", Barcelona);
+        this.Mapa.put("Paris", Paris);
 
     }
     public void criar_camioes_default(){
@@ -70,27 +73,90 @@ public class Empresa {
         this.Camioes.add(c);
     }
 
-    public void addHub(Hub h){
-        this.Mapa.add(h);
+    public void addHub(String h_nome,Hub h){
+        this.Mapa.put(h_nome, h);
     }
+
+    public void removeHub(String h_nome){
+        this.Mapa.remove(h_nome);
+    }
+
+    public Map<String,Object> get_min_route(String from_hub_nome, String to_hub_nome) {
+
+        Map<String, Integer> routeDistance = new HashMap<>();
+        Map<String, String> routeMap = new HashMap<>();
+
+        Integer inf = 99999999;
+
+        for(String key: this.Mapa.keySet()) {
+            routeDistance.put(key, inf);
+            routeMap.put(key, "null");
+        }
+
+        routeDistance.put(from_hub_nome, 0);
+
+        for(int i=0; i < this.Mapa.size()-1; i++) {
+            for(String from_city_name: this.Mapa.keySet()) {
+                for(String to_city_name: this.Mapa.get(from_city_name).ligacoes.keySet()){
+                    Integer i1 = routeDistance.get(to_city_name);
+                    Integer i2 = this.Mapa.get(from_city_name).ligacoes.get(to_city_name);
+                    Integer i3 = routeDistance.get(from_city_name);
+                    if (i1 > (i2 + i3)) {
+                        routeDistance.put(to_city_name,
+                            this.Mapa.get(from_city_name).ligacoes.get(to_city_name) + routeDistance.get(from_city_name)
+                        );
+                        routeMap.put(to_city_name, from_city_name);
+                    }
+                }
+            }
+        }
+
+        for(String from_city_name: this.Mapa.keySet()) {
+            for(String to_city_name: this.Mapa.get(from_city_name).ligacoes.keySet()) {
+                if (routeDistance.get(to_city_name) > 
+                (routeDistance.get(from_city_name) + this.Mapa.get(from_city_name).ligacoes.get(to_city_name))) {
+                    return null;
+                }
+            }
+        }
+
+        Integer minDistance = routeDistance.get(to_hub_nome);
+
+        List<String> route = new ArrayList<String>();
+        route.add(to_hub_nome);
+        String n;
+        do {
+            n = routeMap.get(to_hub_nome);
+            route.add(n);
+            to_hub_nome = n;
+        } while(routeMap.get(to_hub_nome) != "null");
+
+        Collections.reverse(route);
+
+        Map<String,Object> r = new HashMap<String,Object>();
+        r.put("minDistance", minDistance);
+        r.put("route", route);
+
+        return r;
+    }
+
 
     public void camioes_to_hubs(){
         for(Camiao c: this.Camioes){
-            for(Hub h: this.Mapa){
+            for(Hub h: this.Mapa.values()){
                 if(c.getLocalizacao().equals(h.getNome())){
                     h.addCamiao(c.clone());
                 }
             }
         }
     }
+    
     public void String() {
         System.out.println("Empresa: " + this.nome + "\n");
         System.out.println("Mapa:");
 
-        Iterator<Hub> iterador = this.Mapa.iterator();
-        while (iterador.hasNext()) {
-            Hub hub = iterador.next();
-            System.out.print( hub.getNome()+"\t");
+        for(String h_nome: this.Mapa.keySet()) {
+            System.out.print( h_nome+"\t");
         }
 
         System.out.println("Camioes: ");

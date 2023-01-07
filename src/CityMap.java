@@ -51,7 +51,7 @@ public class CityMap {
 
         for(String key: this.graph.keySet()) {
             routeDistance.put(key, inf);
-            routeMap.put(key, "");
+            routeMap.put(key, null);
         }
 
         routeDistance.put(city_name, 0);
