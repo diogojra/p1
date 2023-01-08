@@ -26,3 +26,4 @@ public abstract class Carga {
         this.peso = peso;
     }
 }
+//ikikikik
